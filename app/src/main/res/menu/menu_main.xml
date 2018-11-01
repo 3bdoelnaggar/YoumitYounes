@@ -1,0 +1,9 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context="elnaggar.youmityounes.MainActivity">
+    <item android:id="@+id/action_youmia"
+          android:title="يومية النهارده"
+          android:orderInCategory="100"
+          app:showAsAction="ifRoom"/>
+</menu>

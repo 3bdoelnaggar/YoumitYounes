@@ -13,5 +13,7 @@ interface ProdauctDatabaseAccessObject {
 
     @Delete
     fun delete(product: Product)
+    @Update
+    fun update(product: Product)
 
 }

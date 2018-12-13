@@ -25,15 +25,16 @@ class ProductAdapter(
     }
 
     override fun onBindViewHolder(p0: ViewHolder, p1: Int) {
-        val item = items?.get(p1)
-        p0.name.text = item?.name
-        p0.price.text = item?.price.toString()
-        p0.quantity.text = item?.quantity.toString()
-        p0.up.setOnClickListener {
-            onUpClicked(item!!)
-        }
-        p0.down.setOnClickListener {
-            onDownClicked(item!!)
+        items?.get(p1)?.let {
+            p0.name.text = it.name
+            p0.price.text = it.price.toString()
+            p0.quantity.text = it.quantity.toString()
+            p0.up.setOnClickListener { _ ->
+                onUpClicked(it)
+            }
+            p0.down.setOnClickListener { _->
+                onDownClicked(it)
+            }
         }
 
 

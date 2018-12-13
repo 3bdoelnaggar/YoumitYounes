@@ -1,5 +1,6 @@
 package elnaggar.youmityounes
 
+import android.arch.persistence.room.Room
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
@@ -13,6 +14,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import elnaggar.youmityounes.database.AppDatabase
 
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
@@ -48,13 +50,12 @@ class MainActivity : AppCompatActivity() {
             if (name.text.toString().equals("") || price.text.toString().equals("") || quantity.text.toString().equals("")) {
                 Toast.makeText(this, "من فضلك املئ كل البياات", Toast.LENGTH_SHORT).show()
             } else {
-                addToDataBase(
-                    Product(
-                        name.text.toString(),
-                        price.text.toString().toDouble(),
-                        quantity.text.toString().toInt()
-                    )
-                )
+                val product = Product()
+                product.name = name.text.toString()
+                product.price = name.text.toString().toDoubleOrNull()
+                product.quantity = quantity.text.toString().toIntOrNull()
+
+                addToDataBase(product)
                 dialog.dismiss()
             }
         }
@@ -64,13 +65,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun addToDataBase(product: Product) {
+        val database =
+            Room.databaseBuilder(this, AppDatabase::class.java, "products.db").fallbackToDestructiveMigration().build()
+        database.productDao().insert(product)
+
 
     }
 
     private fun getProducts(): ArrayList<Product>? {
-        val array = ArrayList<Product>()
-
-        return array
+        val database =
+            Room.databaseBuilder(this, AppDatabase::class.java, "products.db").fallbackToDestructiveMigration().build()
+        return database.productDao().all as ArrayList<Product>
 
     }
 
@@ -85,7 +90,7 @@ class MainActivity : AppCompatActivity() {
         name.text = product.name
         done.setOnClickListener {
             if (price.text.toString() != "") {
-                addToSoldProducts()
+                addToSoldProducts(product)
                 dialog.dismiss()
             } else {
                 Toast.makeText(this, "ما كتبتش السعر", Toast.LENGTH_SHORT).show()
@@ -97,8 +102,11 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun addToSoldProducts() {
-
+    private fun addToSoldProducts(product: Product) {
+        val database =
+            Room.databaseBuilder(this, AppDatabase::class.java, "products.db").fallbackToDestructiveMigration().build()
+        product.quantity = product.quantity?.minus(1)
+        database.productDao().update(product)
 
 
     }
@@ -115,7 +123,7 @@ class MainActivity : AppCompatActivity() {
         name.text = product.name
         done.setOnClickListener {
             if (quantity.text.toString() != "") {
-                addToSoldProducts()
+                addProducts(product)
                 dialog.dismiss()
             } else {
                 Toast.makeText(this, "ما كتبتش العدد", Toast.LENGTH_SHORT).show()
@@ -124,6 +132,16 @@ class MainActivity : AppCompatActivity() {
         }
         dialog.show()
 
+    }
+
+    private fun addProducts(product: Product) {
+        val database = getDataBase()
+        database.productDao().update(product)
+    }
+
+    private fun getDataBase(): AppDatabase {
+        return Room.databaseBuilder(this, AppDatabase::class.java, "products.db").fallbackToDestructiveMigration()
+            .build()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
